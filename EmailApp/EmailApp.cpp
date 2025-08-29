@@ -5,11 +5,16 @@
 #include "EmailApp.h"
 
 #define MAX_LOADSTRING 100
+#define ID_CLICKME 1001
+#define ID_GENBOX 1002
+#define ID_HEADER 1003
 
 // Global Variables:
 HINSTANCE hInst;                                // current instance
 WCHAR szTitle[MAX_LOADSTRING];                  // The title bar text
 WCHAR szWindowClass[MAX_LOADSTRING];            // the main window class name
+HWND textbox;
+bool showTextBox = true;
 
 // Forward declarations of functions included in this code module:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
@@ -17,6 +22,7 @@ BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    Poop(HWND, UINT, WPARAM, LPARAM);
+void                CreateStartPage(HWND);
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
@@ -129,25 +135,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
     case WM_CREATE:
         {
-            // Create a button
-            CreateWindowEx(
-                0, L"BUTTON", L"Click Me",
-                WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,
-                10, 10, 100, 30,     // x, y, width, height
-                hWnd,                // parent is your main window
-                (HMENU)1001,         // control ID
-                hInst,               // global instance handle
-                nullptr);
-
-            // Create text box
-            CreateWindowEx(
-                WS_EX_CLIENTEDGE, L"EDIT", L"",
-                WS_CHILD | WS_VISIBLE | WS_BORDER | ES_AUTOHSCROLL,
-                10, 50, 200, 20,
-                hWnd,
-                (HMENU)1002,
-                hInst,
-                nullptr);
+            CreateStartPage(hWnd);
         }
 
     case WM_COMMAND:
@@ -165,6 +153,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             case IDM_POOP:
                 DialogBox(hInst, MAKEINTRESOURCE(IDD_POOPBOX), hWnd, Poop);
                 break;
+            case ID_CLICKME:
+                showTextBox = false;
+                ShowWindow(textbox, SW_HIDE);
+                InvalidateRect(hWnd, NULL, TRUE);
+                break;
             default:
                 return DefWindowProc(hWnd, message, wParam, lParam);
             }
@@ -175,6 +168,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             PAINTSTRUCT ps;
             HDC hdc = BeginPaint(hWnd, &ps);
             // TODO: Add any drawing code that uses hdc here...
+            if (!showTextBox) {
+                TextOut(hdc, 10, 50, L"Email sent!", 12);
+            }
             EndPaint(hWnd, &ps);
         }
         break;
@@ -228,5 +224,39 @@ INT_PTR CALLBACK Poop(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
         break;
     }
     return (INT_PTR)FALSE;
+}
+
+void CreateStartPage(HWND hWnd) {
+
+    // Create header text
+    CreateWindowEx(
+        0, L"STATIC", L"Email Application",
+        WS_VISIBLE | WS_CHILD,
+        10, 10, 140, 30,
+        hWnd,
+        (HMENU)ID_HEADER,
+        hInst,
+        nullptr
+    );
+
+    // Create text box
+    textbox = CreateWindowEx(
+        WS_EX_CLIENTEDGE, L"EDIT", L"",
+        WS_CHILD | WS_VISIBLE | WS_BORDER | ES_AUTOHSCROLL,
+        10, 50, 200, 20,
+        hWnd,
+        (HMENU)ID_GENBOX,
+        hInst,
+        nullptr);
+
+    // Create a button
+    CreateWindowEx(
+        0, L"BUTTON", L"Email Button",
+        WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,
+        10, 100, 100, 30,     // x, y, width, height
+        hWnd,                // parent is your main window
+        (HMENU)ID_CLICKME,   // control ID
+        hInst,               // global instance handle
+        nullptr);
 }
 
