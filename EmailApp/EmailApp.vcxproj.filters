@@ -60,5 +60,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="application.yaml" />
+    <None Include="vcpkg.json" />
   </ItemGroup>
 </Project>
