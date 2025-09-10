@@ -2,7 +2,7 @@
 #include "EmailApp.h"
 #include "Utilities.h"
 
-void CreateStartPage(HWND hWnd, HWND* recipient, HWND* textbox, HWND* clearButton, HWND* emailButton, HWND* sendAnother, HINSTANCE hInst) {
+void CreateComposePage(HWND hWnd, HWND* recipient, HWND* textbox, HWND* clearButton, HWND* emailButton, HWND* sendAnother, HINSTANCE hInst) {
 
     // Create header text
     CreateWindowEx(
@@ -51,7 +51,7 @@ void CreateStartPage(HWND hWnd, HWND* recipient, HWND* textbox, HWND* clearButto
         WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_OWNERDRAW,
         115, 150, 100, 30,     // x, y, width, height
         hWnd,                // parent is your main window
-        (HMENU)ID_CLICKME,   // control ID
+        (HMENU)ID_SEND,   // control ID
         hInst,               // global instance handle
         nullptr);
 
@@ -68,7 +68,7 @@ void CreateStartPage(HWND hWnd, HWND* recipient, HWND* textbox, HWND* clearButto
 
 void PaintStartButtons(LPDRAWITEMSTRUCT lpdis) {
     //Styling "Send Email" button
-    if (lpdis->CtlID == ID_CLICKME) // button ID
+    if (lpdis->CtlID == ID_SEND) // button ID
     {
         // Choose colors
         COLORREF bgColor = (lpdis->itemState & ODS_SELECTED) ? RGB(150, 200, 255) : RGB(200, 200, 255);

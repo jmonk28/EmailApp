@@ -1,3 +1,4 @@
+#define WIN32_LEAN_AND_MEAN
 #include "EmailFunctionality.h"
 #include "Utilities.h"
 #include "Resource.h"
@@ -9,6 +10,9 @@
 #include <shellapi.h>
 #include <iostream>
 #include <stdexcept>
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#pragma comment(lib, "Ws2_32.lib")
 
 // This function builds the authorization url to request a code from the OAuth2 endpoint
 std::string getAuthCode() {

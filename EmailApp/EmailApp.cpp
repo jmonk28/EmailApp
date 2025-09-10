@@ -4,6 +4,8 @@
 #include "framework.h"
 #include "EmailApp.h"
 #include "Utilities.h"
+#include "EmailFunctionality.h"
+#include <string>
 
 #define MAX_LOADSTRING 100
 
@@ -16,8 +18,13 @@ HWND textbox;
 HWND clearButton;
 HWND emailButton;
 HWND sendAnother;
+HWND composeTab;
+HWND draftsTab;
+HWND inboxTab;
 bool showTextBox = true;
 bool showSendAnother = false;
+std::string accessToken;
+std::string refreshToken;
 
 // Forward declarations of functions included in this code module:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
@@ -138,7 +145,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
     case WM_CREATE:
         {
-            CreateStartPage(hWnd, &recipient, &textbox, &clearButton, &emailButton, &sendAnother, hInst);
+            CreateComposePage(hWnd, &recipient, &textbox, &clearButton, &emailButton, &sendAnother, hInst);
         }
 
     case WM_COMMAND:
@@ -156,7 +163,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             case IDM_POOP:
                 DialogBox(hInst, MAKEINTRESOURCE(IDD_POOPBOX), hWnd, Poop);
                 break;
-            case ID_CLICKME:
+            case ID_SEND:
                 showTextBox = false;
                 ShowWindow(recipient, SW_HIDE);
                 ShowWindow(textbox, SW_HIDE);
