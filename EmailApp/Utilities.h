@@ -7,7 +7,14 @@
 #define ID_CLEAR 1004
 #define ID_SENDANOTHER 1005
 #define IDC_TABCONTROL 1006
+#define ID_MARKREAD 1007
 
-void CreateComposePage(HWND, HWND*, HWND*, HWND*, HWND*, HWND*, HINSTANCE);
+void CreateTabs(HWND, HWND*);
+
+void CreateInboxPage(HWND, HWND*, HINSTANCE);
+
+void CreateComposePage(HWND, HWND*, HINSTANCE);
 
 void PaintStartButtons(LPDRAWITEMSTRUCT);
+
+void ShowGroup(HWND*, int, BOOL);

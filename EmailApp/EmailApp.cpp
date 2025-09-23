@@ -6,6 +6,7 @@
 #include "Utilities.h"
 #include "EmailFunctionality.h"
 #include <string>
+#include <commctrl.h>
 
 #define MAX_LOADSTRING 100
 
@@ -13,14 +14,10 @@
 HINSTANCE hInst;                                // current instance
 WCHAR szTitle[MAX_LOADSTRING];                  // The title bar text
 WCHAR szWindowClass[MAX_LOADSTRING];            // the main window class name
-HWND recipient;
-HWND textbox;
-HWND clearButton;
-HWND emailButton;
-HWND sendAnother;
+HWND composeControls[5];
+HWND inboxControls[2];
 HWND composeTab;
-HWND draftsTab;
-HWND inboxTab;
+HWND tabs;
 bool showTextBox = true;
 bool showSendAnother = false;
 std::string accessToken;
@@ -145,7 +142,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
     case WM_CREATE:
         {
-            CreateComposePage(hWnd, &recipient, &textbox, &clearButton, &emailButton, &sendAnother, hInst);
+            CreateTabs(hWnd, &tabs);
+            CreateInboxPage(hWnd, inboxControls, hInst);
+            CreateComposePage(hWnd, composeControls, hInst);
+            //Start with compose page showing, inbox page hidden
+            ShowGroup(inboxControls, 2, FALSE);
         }
 
     case WM_COMMAND:
@@ -165,27 +166,29 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 break;
             case ID_SEND:
                 showTextBox = false;
-                ShowWindow(recipient, SW_HIDE);
-                ShowWindow(textbox, SW_HIDE);
-                ShowWindow(clearButton, SW_HIDE);
-                ShowWindow(emailButton, SW_HIDE);
-                ShowWindow(sendAnother, SW_NORMAL);
+                ShowWindow(composeControls[0], SW_HIDE);
+                ShowWindow(composeControls[1], SW_HIDE);
+                ShowWindow(composeControls[2], SW_HIDE);
+                ShowWindow(composeControls[3], SW_HIDE);
+                ShowWindow(composeControls[4], SW_NORMAL);
                 InvalidateRect(hWnd, NULL, TRUE);
                 break;
             case ID_CLEAR:
-                SetWindowText(recipient, L"");
-                SetWindowText(textbox, L"");
+                SetWindowText(composeControls[0], L"");
+                SetWindowText(composeControls[1], L"");
                 break;
             case ID_SENDANOTHER:
                 showTextBox = true;
-                ShowWindow(recipient, SW_NORMAL);
-                ShowWindow(textbox, SW_NORMAL);
-                ShowWindow(clearButton, SW_NORMAL);
-                ShowWindow(emailButton, SW_NORMAL);
-                ShowWindow(sendAnother, SW_HIDE);
-                SetWindowText(recipient, L"");
-                SetWindowText(textbox, L"");
+                ShowWindow(composeControls[0], SW_NORMAL);
+                ShowWindow(composeControls[1], SW_NORMAL);
+                ShowWindow(composeControls[2], SW_NORMAL);
+                ShowWindow(composeControls[3], SW_NORMAL);
+                ShowWindow(composeControls[4], SW_HIDE);
+                SetWindowText(composeControls[0], L"");
+                SetWindowText(composeControls[1], L"");
                 InvalidateRect(hWnd, NULL, TRUE);
+                break;
+            case ID_MARKREAD:
                 break;
             default:
                 return DefWindowProc(hWnd, message, wParam, lParam);
@@ -214,6 +217,18 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             return TRUE;
         }
     break;
+    case WM_NOTIFY:
+        {
+            LPNMHDR pnmh = (LPNMHDR)lParam;
+            if (pnmh->idFrom == IDC_TABCONTROL && pnmh->code == TCN_SELCHANGE) {
+                int iPage = TabCtrl_GetCurSel(pnmh->hwndFrom);
+
+                // Toggle groups based on selected tab
+                ShowGroup(inboxControls, 2, iPage == 0);
+                ShowGroup(composeControls, 4, iPage == 1);
+            }
+        }
+        break;
     case WM_DESTROY:
         PostQuitMessage(0);
         break;
